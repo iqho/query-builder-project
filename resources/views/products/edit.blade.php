@@ -26,7 +26,7 @@
 
             <div class="row">
                 <div class="col-12">
-                    <form action="{{ route('products.update', $product->id) }}" method="post" enctype="multipart/form-data">
+                    <form action="{{ route('product.update', $product->id) }}" method="post" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 

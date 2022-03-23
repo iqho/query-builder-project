@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
-use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +11,7 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = DB::table('categories')->orderBy('id', 'ASC')->get(['id','name', 'is_active']);
+        $categories = DB::table('categories')->orderBy('id', 'ASC')->get(['id', 'name', 'is_active']);
         return view('categories.index', compact('categories'));
     }
 
@@ -29,54 +27,55 @@ class CategoryController extends Controller
             'is_active' => 'boolean'
         ]);
 
-        $category = new Category;
-        $category->name = $request->name;
-        $category->is_active = $request->is_active ? $request->is_active : 0 ;
-        $category->save();
+        DB::table('categories')->insert([
+            'name' => $request->name,
+            'is_active' => $request->is_active ? $request->is_active : 0,
+        ]);
 
         return redirect()->route('categories.index')->with('success', 'Category Created Successfully.');;
     }
 
-    public function edit(Category $category)
+    public function edit($id)
     {
-      return view('categories.edit', compact('category'));
+        $category = DB::table('categories')->find($id);
+        return view('categories.edit', compact('category'));
     }
 
-    public function update(Request $request, Category $category)
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|max:255|unique:categories,name,'.$category->id,
+            'name' => 'required|max:255|unique:categories,name,' . $id,
             'is_active' => 'boolean'
         ]);
 
-        $category->name = $request->name;
-        $category->is_active = $request->is_active ? $request->is_active : 0 ;
-        $category->update();
+        DB::table('categories')->where('id', $id)->update([
+            'name' => $request->name,
+            'is_active' => $request->is_active ? $request->is_active : 0,
+        ]);
 
         return redirect()->route('categories.index')->with('success', 'Category Updated Successfully.');
     }
 
-    public function destroy(Category $category)
+    public function destroy($id)
     {
 
-        $products = Product::where('category_id', $category->id)->count();
+        $products = DB::table('products')->where('category_id', $id)->count();
 
-        if($products > 0){
-            Product::where('category_id', $category->id)->update(['category_id' => 1]);
+        if ($products > 0) {
+            DB::table('products')->where('category_id', $id)->update(['category_id' => 1]);
         }
 
-        $category->delete();
+        DB::table('categories')->where('id', $id)->delete();
 
         return redirect()->route('categories.index')->with('success', 'Category Deleted Successfully.');
     }
 
     public function ChangeStatus(Request $request)
     {
-        $category = Category::find($request->category_id);
-        $category->is_active = $request->status;
-        $category->save();
+        DB::table('categories')->where('id', $request->category_id)->update([
+            'is_active' => $request->status
+        ]);
 
         return response()->json(['success' => 'Category Active Status Change Successfully.']);
     }
-
 }

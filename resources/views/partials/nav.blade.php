@@ -13,7 +13,7 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link @if(Request::is('products/create')) active @endif" aria-current="page" href="{{ route('products.create') }}">Add New Product</a>
+                <a class="nav-link @if(Request::is('product/create')) active @endif" aria-current="page" href="{{ route('product.create') }}">Add New Product</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @if(Request::is('products')) active @endif" aria-current="page" href="{{ route('products.index') }}">All Products</a>

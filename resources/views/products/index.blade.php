@@ -6,9 +6,9 @@
     <div class="card mt-3">
         <div class="card-header">
             <h3 class="d-inline-block">All Products</h3>
-            <a href="{{ route('products.create') }}" class="btn btn-success float-end">Create New Product</a>
+            <a href="{{ route('product.create') }}" class="btn btn-success float-end">Create New Product</a>
         </div>
-        
+
         <div class="card-body">
             <div class="row">
                 <div class="col-12">
@@ -63,14 +63,14 @@
                                             @endif
                                         </td>
                                         <td class="align-middle">
-                                            @forelse ($product->productPrices as $row)
+                                            {{-- @forelse ($product->productPrices as $row)
                                                     <strong> @if ($row->priceType) {{ $row->priceType->name }} @else No Price Type @endif:
                                                         @if ($row->price) {{ $row->price }} @else No Price @endif</strong><br>
                                                         @if ($row->active_date) <small> Active From: {{ date('d F Y', strtotime($row->active_date)) }} </small> @endif
                                                     <hr class="g-0">
                                             @empty
                                             <small>No Price</small>
-                                            @endforelse
+                                            @endforelse --}}
                                         </td>
 
                                         <td class="align-middle text-center">
@@ -78,18 +78,18 @@
                                         </td>
                                         <td class="align-middle text-center">
                                             @if ($product->category)
-                                            {{ $product->category->name }}
+                                            {{ $product->name }}
                                             @else
                                             <small>No Category</small>
                                             @endif
                                         </td>
                                         <td class="align-middle text-center">
                                             <div class="btn-group" role="group">
-                                                <a class="btn btn-primary me-1" href="{{ route('products.edit', $product->id) }}">Edit</a>
+                                                <a class="btn btn-primary me-1" href="{{ route('product.edit', $product->id) }}">Edit</a>
 
-                                                <form action="{{ route('products.destroy', $product->id) }}" method="POST">
+                                                <form action="{{ route('product.destroy', $product->id) }}" method="POST">
                                                     @csrf
-                                                    @method('DELETE')
+
                                                     <button type="submit" onclick="return confirm('Are you sure want to delete this product ?')" class="btn btn-danger btn-block">Delete</button>
                                                 </form>
 

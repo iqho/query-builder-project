@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\PriceType;
 use App\Models\ProductPrice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
 use Illuminate\Database\QueryException;
@@ -19,15 +20,18 @@ class ProductController extends Controller
 
     public function index()
     {
-        $products = Product::orderBy('id', 'ASC')->get();
+        $products = DB::table('products as p')
+                                        ->join('categories as cat', 'p.category_id', '=', 'cat.id')
+                                        ->select('p.*', 'cat.name')
+                                        ->get();
 
         return view('products.index', compact('products'));
     }
 
     public function create()
     {
-        $categories = Category::where('is_active', 1)->Orderby('id', 'DESC')->get(['id', 'name']);
-        $price_types = PriceType::where('is_active', 1)->Orderby('id', 'ASC')->get(['id', 'name']);
+        $categories = DB::table('categories')->where('is_active', 1)->Orderby('id', 'DESC')->get(['id', 'name']);
+        $price_types = DB::table('price_types')->where('is_active', 1)->Orderby('id', 'ASC')->get(['id', 'name']);
 
         return view('products.create', compact('categories', 'price_types'));
     }
@@ -93,10 +97,11 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product Created Successfully.');
     }
 
-    public function edit(Product $product)
+    public function edit($id)
     {
-        $categories = Category::where('is_active', 1)->Orderby('id', 'DESC')->get(['id', 'name']);
-        $price_types = PriceType::where('is_active', 1)->Orderby('id', 'ASC')->get(['id', 'name']);
+        $product = DB::table('products')->find($id);
+        $categories = DB::table('categories')->where('is_active', 1)->Orderby('id', 'DESC')->get(['id', 'name']);
+        $price_types = DB::table('price_types')->where('is_active', 1)->Orderby('id', 'ASC')->get(['id', 'name']);
 
         return view('products.edit', compact('product', 'categories', 'price_types'));
     }
