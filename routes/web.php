@@ -10,8 +10,13 @@ Route::get('/', function () {
 });
 
 // Category Table
+Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
+Route::post('categories/store', [CategoryController::class, 'store'])->name('categories.store');
+Route::get('categories/edit/{category}', [CategoryController::class, 'edit'])->name('categories.edit');
+Route::post('categories/update/{category}', [CategoryController::class, 'update'])->name('categories.update');
+Route::post('categories/destroy/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 Route::get('category/change-status', [CategoryController::class, 'ChangeStatus'])->name('category.changeStatus');
-Route::resource('categories', CategoryController::class);
 
 // Product Table
 Route::get('products/change-status', [ProductController::class, 'ChangeStatus'])->name('product.changeStatus');

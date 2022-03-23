@@ -24,7 +24,6 @@
                 <div class="col-12">
                     <form action="{{ route('categories.update', $category->id) }}" method="post" enctype="multipart/form-data">
                         @csrf
-                        @method('PUT')
 
                         <div class="col-12 mb-3 mt-1">
                             <label for="name" class="form-label">Category Name</label>

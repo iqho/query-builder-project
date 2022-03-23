@@ -6,13 +6,14 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
 
     public function index()
     {
-        $categories = Category::orderBy('id', 'ASC')->get(['id','name', 'is_active']);
+        $categories = DB::table('categories')->orderBy('id', 'ASC')->get(['id','name', 'is_active']);
         return view('categories.index', compact('categories'));
     }
 

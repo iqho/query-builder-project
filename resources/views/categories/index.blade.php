@@ -51,9 +51,8 @@
                                         <div class="btn-group" role="group">
                                             <a class="btn btn-primary me-1" href="{{ route('categories.edit', $category->id) }}">Edit</a>
 
-                                            <form action="{{ route('categories.destroy', $category->id) }}" method="POST">
+                                            <form action="{{ route('categories.destroy', $category->id) }}" method="post">
                                                 @csrf
-                                                @method('DELETE')
                                                 <button type="submit" onclick="return confirm('Are you sure ?')" class="btn btn-danger btn-block">Delete</button>
                                             </form>
 
