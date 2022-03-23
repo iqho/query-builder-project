@@ -1,0 +1,19 @@
+                {{-- {{ date('Y-m-d'); }} --}}
+
+                {{-- {{ $product->productPrices->where('price_type_id', 2)->first()->active_date }} {{ $curDate }} --}}
+                {{-- {{ $product->productPrices->where('price_type_id', 1)->where('active_date','<=', $curDate)->first()->price }}
+                <hr>
+                @if(($product->productPrices->where('price_type_id', 2)->first()->active_date) <= $curDate)
+                {{ $product->productPrices->where('price_type_id', 2)->first()->price }}
+                @else
+                {{ $product->productPrices->where('price_type_id', 1)->first()->price }}
+                @endif --}}
+
+// Model
+
+    public function wholeSalePrice() {
+       return $this->productPrices()->where('price_type_id', 2)->first();
+    }
+    public function retailPrice() {
+       return $this->productPrices()->where('price_type_id', 1)->first();
+    }

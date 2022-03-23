@@ -1,0 +1,11 @@
+
+                //$exitsArray = Arr::except($values, 'product_price_id');
+                //$onlyPid = Arr::only($values, 'product_price_id');
+
+               // $filteredArray = collect($values)->where($onlyPid, '==', NULL)->all();
+
+                //dd($onlyPid);
+
+                //$filtered2 = array_filter( $values, function( $v ) { return is_null( $v ); } );
+
+                //$newArray = Arr::except($filteredArray, 'product_price_id');

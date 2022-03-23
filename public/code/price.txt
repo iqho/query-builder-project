@@ -1,0 +1,12 @@
+                        <td class="align-middle">
+                            @php
+                            $curDate = date('Y-m-d');
+                            @endphp
+
+                            @if ($product->wholeSalePrice() && ($product->wholeSalePrice()->active_date) <= $curDate)
+                            {{ $product->wholeSalePrice()->price }}
+                            @else
+                            {{ $product->retailPrice()->price }}
+                            @endif
+                            
+                        </td>
