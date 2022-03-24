@@ -22,7 +22,8 @@ class ProductController extends Controller
     {
         $products = DB::table('products as p')
                                         ->join('categories as cat', 'p.category_id', '=', 'cat.id')
-                                        ->select('p.*', 'cat.name')
+                                        ->join('product_prices as p_price', 'p.id', '=', 'p_price.product_id')
+                                        ->select('p.*', 'cat.name as cat_name', 'p_price.price as prices', 'p_price.active_date as active_dates')
                                         ->get();
 
         return view('products.index', compact('products'));
@@ -46,22 +47,23 @@ class ProductController extends Controller
         ]);
 
         try {
-            // creating a product instance
-            $product = new Product;
-
-            // assigning form data to the product instance
-            $product->title = $request->title;
-            $product->description = $request->description;
-            $product->is_active = $request->is_active ? $request->is_active : 0;
-            $product->category_id = $request->category_id;
 
             $image = $request->file('image');
             if ($image) {
                 $imageName = date("dmYhis") . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('product-images'), $imageName);
-                $product->image = $imageName;
             }
-            $product->save();
+
+            $values = [
+                'title' => $request->title,
+                'description' => $request->description,
+                'category_id' => $request->category_id,
+                'image' => $imageName ? $imageName : NULL,
+                'is_active' => $request->is_active ? $request->is_active : 0,
+                ];
+
+            DB::table('products')->insert($values);
+            $lastId = DB::getPdo()->lastInsertId();
 
             // Product Price Type Store
             $getAllPrices = $request->price;
@@ -72,7 +74,7 @@ class ProductController extends Controller
 
             foreach ($getAllPrices as $index => $price) {
                 $values[] = [
-                    'product_id' => $product->id,
+                    'product_id' => $lastId,
                     'price' => $price,
                     'price_type_id' => $price_type_id[$index],
                     'active_date' => $active_date[$index],
@@ -80,7 +82,7 @@ class ProductController extends Controller
             }
 
             if ( ($price !== NULL) && ($price_type_id[$index] !== NULL) ){
-                $product->productPrices()->insert($values);
+               // $product->productPrices()->insert($values);
             }
 
         } catch (QueryException $e) {
@@ -198,9 +200,9 @@ class ProductController extends Controller
 
     public function ChangeStatus(Request $request)
     {
-        $product = Product::find($request->product_id);
-        $product->is_active = $request->status;
-        $product->save();
+        DB::table('products')->where('id', $request->product_id)->update([
+            'is_active' => $request->status
+        ]);
 
         return response()->json(['success' => 'Product Active Status Change Successfully.']);
     }

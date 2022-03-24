@@ -63,12 +63,15 @@
                                             @endif
                                         </td>
                                         <td class="align-middle">
-                                            {{-- @forelse ($product->productPrices as $row)
-                                                    <strong> @if ($row->priceType) {{ $row->priceType->name }} @else No Price Type @endif:
+                                            <strong>{{ $product->prices }}</strong><br>
+                                            <small> Active From: {{ date('d F Y', strtotime($product->active_dates)) }} </small>
+                                            {{-- @forelse ($product->prices as $row)
+                                            {{ $row->price }}
+                                                    {{-- <strong> @if ($row->priceType) {{ $row->priceType->name }} @else No Price Type @endif:
                                                         @if ($row->price) {{ $row->price }} @else No Price @endif</strong><br>
                                                         @if ($row->active_date) <small> Active From: {{ date('d F Y', strtotime($row->active_date)) }} </small> @endif
-                                                    <hr class="g-0">
-                                            @empty
+                                                    <hr class="g-0"> --}}
+                                            {{-- @empty
                                             <small>No Price</small>
                                             @endforelse --}}
                                         </td>
@@ -77,8 +80,8 @@
                                             <input data-id="{{$product->id}}" class="toggle-class" type="checkbox" data-onstyle="success" data-offstyle="danger" data-toggle="toggle" data-on="Active" data-off="Inactive" {{ $product->is_active ? 'checked' : '' }}>
                                         </td>
                                         <td class="align-middle text-center">
-                                            @if ($product->category)
-                                            {{ $product->name }}
+                                            @if ($product->cat_name)
+                                            {{ $product->cat_name}}
                                             @else
                                             <small>No Category</small>
                                             @endif
