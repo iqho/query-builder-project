@@ -70,8 +70,8 @@
                                                     {{-- <strong> @if ($row->priceType) {{ $row->priceType->name }} @else No Price Type @endif:
                                                         @if ($row->price) {{ $row->price }} @else No Price @endif</strong><br>
                                                         @if ($row->active_date) <small> Active From: {{ date('d F Y', strtotime($row->active_date)) }} </small> @endif
-                                                    <hr class="g-0"> --}}
-                                            {{-- @empty
+                                                    <hr class="g-0">
+                                             @empty
                                             <small>No Price</small>
                                             @endforelse --}}
                                         </td>
@@ -81,7 +81,7 @@
                                         </td>
                                         <td class="align-middle text-center">
                                             @if ($product->cat_name)
-                                            {{ $product->cat_name}}
+                                            {{ $product->cat_name }}
                                             @else
                                             <small>No Category</small>
                                             @endif
@@ -120,7 +120,7 @@
             $.ajax({
                 type: "GET",
                 dataType: "json",
-                url: '{{ route('product.changeStatus') }}',
+                url: '{{ route('product.updateStatus') }}',
                 data: {'status': status, 'product_id': product_id},
                 success: function(data){
                     $("#successMessage").html(data.success).show().delay(3000).fadeOut(400);;

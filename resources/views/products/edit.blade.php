@@ -28,7 +28,6 @@
                 <div class="col-12">
                     <form action="{{ route('product.update', $product->id) }}" method="post" enctype="multipart/form-data">
                         @csrf
-                        @method('PUT')
 
                         <div class="row">
                             <div class="col-12 mb-3">
@@ -62,17 +61,9 @@
                             <div class="col-8">
                                 <label for="category_id" class="form-label">Product Category</label>
                                 <select class="form-select mb-3" id="category_id" name="category_id">
-
-                                    @if($product->category)
-                                    <option value="{{ $product->category->id }}" selected>{{ $product->category->name }}</option>
-                                    @else
-                                    <option value="" selected>Please Select Product Category</option>
-                                    @endif
-
                                     @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    <option value="{{ $category->id }}" @if($category->id == $product->cat_id) selected @endif>{{ $category->name }}</option>
                                     @endforeach
-
                                 </select>
                             </div>
 
@@ -102,7 +93,71 @@
                             </div>
                         </div>
 
-                        @forelse ($product->productPrices as $row)
+
+                        {{-- @forelse ($product->productPrices as $row) --}}
+
+                            <div class="row prices g-0 del_row{{ $product->price_ids }}">
+
+                                <input type="hidden" value="{{ $product->price_ids }}" name="product_price_id[]" />
+
+                                <div class="col-md-3 col-12 g-0" style="margin-top:5px!important; padding-right:5px!important">
+                                    <select class="form-select" name="price_type_id[]" id="price_type_id">
+                                        @foreach ($price_types as $ptype)
+                                        <option value="{{ $ptype->id }}">{{ $ptype->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3 col-12 g-0" style="margin-top:5px!important; padding-right:5px!important">
+                                    <input type="number" min="0" class="form-control" name="price[]" id="price" placeholder="Price"
+                                            value="{{ $product->prices }}">
+                                </div>
+
+                                <div class="col-md-4 col-12 g-0" style="margin-top:5px!important; padding-right:5px!important">
+                                    <input type="date" class="form-control" name="active_date[]" value="{{ $product->active_dates }}"
+                                        id="active_date">
+                                </div>
+
+                                <div class="col-md-2 col-12 d-flex align-items-end g-0" style="margin-top:5px!important;">
+                                    <a href="javascript:void(0)" class="btn btn-danger deleteRecord" data-id="{{ $product->price_ids }}"><span class="glyphicon glyphicon glyphicon-remove"
+                                            aria-hidden="true"></span> Remove</a>
+                                </div>
+
+                            </div>
+
+                        {{-- @empty --}}
+
+                            <div class="row prices g-0"  style="margin-top:5px!important;">
+
+                                <div class="col-sm-12 col-md-3 g-0" style="padding-right:5px!important">
+                                    <select class="form-select" name="price_type_new_id[]" id="price_type_id">
+                                        <option value="" selected>Select Price Type</option>
+
+                                        @foreach ($price_types as $ptype)
+                                        <option value="{{ $ptype->id }}">{{ $ptype->name }}</option>
+                                        @endforeach
+
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3 col-12 g-0" style="padding-right:5px!important">
+                                    <input type="number" min="0" class="form-control" name="new_price[]" id="price" placeholder="Price"
+                                        value="{{ old('price[]') }}">
+                                </div>
+
+                                <div class="col-md-4 col-12 g-0" style="padding-right:5px!important">
+                                    <input type="date" class="form-control" name="new_active_date[]" value="{{ date('Y-m-d') }}" id="active_date">
+                                </div>
+
+                                <div class="col-md-2 col-12 d-flex align-items-end g-0">
+                                    <a href="javascript:void(0)" class="btn btn-danger remove"><span class="glyphicon glyphicon glyphicon-remove" aria-hidden="true"></span> Remove</a>
+                                </div>
+
+                            </div>
+
+                        {{-- @endforelse --}}
+
+                        {{-- @forelse ($product->productPrices as $row)
 
                             <div class="row prices g-0 del_row{{ $row->id }}">
 
@@ -171,7 +226,7 @@
 
                             </div>
 
-                        @endforelse
+                        @endforelse --}}
 
                         <div class="row">
                             <div class="col-12 mt-2">

@@ -60,7 +60,6 @@ class CategoryController extends Controller
     {
 
         $products = DB::table('products')->where('category_id', $id)->count();
-
         if ($products > 0) {
             DB::table('products')->where('category_id', $id)->update(['category_id' => 1]);
         }

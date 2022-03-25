@@ -26,7 +26,7 @@ Route::post('product/store', [ProductController::class, 'store'])->name('product
 Route::get('product/edit/{id}', [ProductController::class, 'edit'])->name('product.edit');
 Route::post('product/update/{id}', [ProductController::class, 'update'])->name('product.update');
 Route::post('product/destroy/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
-Route::get('product/change-status', [ProductController::class, 'ChangeStatus'])->name('product.changeStatus');
+Route::get('product/change-status', [ProductController::class, 'updateStatus'])->name('product.updateStatus');
 
 Route::post('product/price-list/{price_id}', [ProductController::class, 'priceListDestroy']); // For Product Price List Delete
 
