@@ -65,15 +65,13 @@
                                         <td class="align-middle">
                                             <strong>{{ $product->prices }}</strong><br>
                                             <small> Active From: {{ date('d F Y', strtotime($product->active_dates)) }} </small>
-                                            {{-- @forelse ($product->prices as $row)
-                                            {{ $row->price }}
-                                                    {{-- <strong> @if ($row->priceType) {{ $row->priceType->name }} @else No Price Type @endif:
+                                           {{-- @foreach ($product->prices as $row) --}}
+
+                                                     {{-- <strong> @if ($row->priceType) {{ $row->priceType->name }} @else No Price Type @endif:
                                                         @if ($row->price) {{ $row->price }} @else No Price @endif</strong><br>
                                                         @if ($row->active_date) <small> Active From: {{ date('d F Y', strtotime($row->active_date)) }} </small> @endif
-                                                    <hr class="g-0">
-                                             @empty
-                                            <small>No Price</small>
-                                            @endforelse --}}
+                                                    <hr class="g-0"> --}}
+                                           {{-- @endforeach --}}
                                         </td>
 
                                         <td class="align-middle text-center">

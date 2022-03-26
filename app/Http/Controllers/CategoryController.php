@@ -4,11 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
+use DB;
 
 class CategoryController extends Controller
 {
-
     public function index()
     {
         $categories = DB::table('categories')->orderBy('id', 'ASC')->get(['id', 'name', 'is_active']);
@@ -58,7 +57,6 @@ class CategoryController extends Controller
 
     public function destroy($id)
     {
-
         $products = DB::table('products')->where('category_id', $id)->count();
         if ($products > 0) {
             DB::table('products')->where('category_id', $id)->update(['category_id' => 1]);

@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
 use Illuminate\Database\QueryException;
 use App\Http\Requests\StoreProductRequest;
+use DB;
 
 class ProductController extends Controller
 {
@@ -19,8 +18,14 @@ class ProductController extends Controller
         {
             $products = DB::table('products as p')
                                 ->join('categories as cat', 'p.category_id', '=', 'cat.id')
-                                ->join('product_prices as p_price', 'p.id', '=', 'p_price.product_id')
+                                ->join('product_prices as p_price', function ($join) {
+                                    $join->on('p.id', '=', 'p_price.product_id');
+                                         //->where('p_price.product_id', '=', '5');
+                                })
                                 ->select('p.*', 'cat.name as cat_name', 'p_price.price as prices', 'p_price.active_date as active_dates')
+                                //->groupBy('p_price.product_id')
+
+                                ->distinct()
                                 ->get();
 
             return view('products.index', compact('products'));
@@ -92,17 +97,18 @@ class ProductController extends Controller
 
     public function edit($id)
         {
+            $prices = DB::table('product_prices as pp')->join('price_types as pt', 'pt.id', 'pp.price_type_id' )->select('pp.*', 'pt.id as pt_id')->where('product_id', $id)->get();
+
             $product = DB::table('products as p')
                                     ->join('categories as cat', 'p.category_id', '=', 'cat.id')
-                                    ->join('product_prices as p_price', 'p.id', '=', 'p_price.product_id')
-                                    ->select('p.*', 'cat.name as cat_name', 'cat.name as cat_id', 'p_price.id as price_ids', 'p_price.active_date as active_dates', 'p_price.price as prices')
+                                    ->select('p.*', 'cat.name as cat_name', 'cat.name as cat_id')
                                     ->where('p.id', '=', $id)->first();
 
 
             $categories = DB::table('categories')->where('is_active', 1)->Orderby('id', 'DESC')->get(['id', 'name']);
             $price_types = DB::table('price_types')->where('is_active', 1)->Orderby('id', 'ASC')->get(['id', 'name']);
 
-            return view('products.edit', compact('product', 'categories', 'price_types'));
+            return view('products.edit', compact('product', 'categories', 'price_types', 'prices'));
         }
 
     public function update(StoreProductRequest $request, $id)

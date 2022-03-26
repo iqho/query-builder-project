@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\PriceType;
 use Illuminate\Http\Request;
+use DB;
 
 class PriceTypeController extends Controller
 {
-
     public function index()
     {
-        $priceTypes = PriceType::orderBy('id', 'ASC')->get(['id','name', 'is_active']);
+        $priceTypes = DB::table('price_types')->orderBy('id', 'ASC')->get(['id','name', 'is_active']);
 
         return view('price-types.index', compact('priceTypes'));
     }
@@ -27,46 +27,50 @@ class PriceTypeController extends Controller
             'is_active' => 'boolean'
         ]);
 
-        $ptype = new PriceType;
-        $ptype->name = $request->name;
-        $ptype->is_active = $request->is_active ? $request->is_active : 0;
-        $ptype->save();
+        DB::table('price_types')->insert([
+            'name' => $request->name,
+            'is_active' => $request->is_active ? $request->is_active : 0
+        ]);
 
         return redirect()->route('all.price-type')->with('success', 'Product Price Type Created Successfully.');;
     }
 
-    public function edit(PriceType $ptype)
+    public function edit($id)
     {
+        $ptype = DB::table('price_types')->find($id);
+
         return view('price-types.edit', compact('ptype'));
     }
 
-    public function update(Request $request, PriceType $ptype)
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|max:255|unique:price_types,name,'.$ptype->id,
+            'name' => 'required|max:255|unique:price_types,name,'.$id,
             'is_active' => 'boolean'
         ]);
 
-        $ptype->name = $request->name;
-        $ptype->is_active = $request->is_active ? $request->is_active : 0;
-        $ptype->update();
+        DB::table('price_types')->where('id', $id)->update([
+            'name' => $request->name,
+            'is_active' => $request->is_active ? $request->is_active : 0
+        ]);
 
         return redirect()->route('all.price-type')->with('success', 'Product Price Type Updated Successfully.');
     }
 
-    public function destroy(PriceType $ptype)
+    public function destroy($id)
     {
-        $ptype->delete();
+        DB::table('price_types')->where('id', $id)->delete();
 
         return redirect()->route('all.price-type')->with('success', 'Product Price Type Deleted Successfully.');
     }
 
-    public function ChangeStatus(Request $request)
+    public function changeStatus(Request $request)
     {
-        $ptype = PriceType::find($request->id);
-        $ptype->is_active = $request->status;
-        $ptype->save();
+        DB::table('price_types')->where('id', $request->id)->update([
+            'is_active' => $request->status
+        ]);
 
         return response()->json(['success' => 'Price Type Active Status Change Successfully.']);
     }
+    
 }

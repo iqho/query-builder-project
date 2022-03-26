@@ -94,38 +94,38 @@
                         </div>
 
 
-                        {{-- @forelse ($product->productPrices as $row) --}}
+                        @forelse ($prices as $row)
+                        
+                            <div class="row prices g-0 del_row{{ $row->id }}">
 
-                            <div class="row prices g-0 del_row{{ $product->price_ids }}">
-
-                                <input type="hidden" value="{{ $product->price_ids }}" name="product_price_id[]" />
+                                <input type="hidden" value="{{ $row->id }}" name="product_price_id[]" />
 
                                 <div class="col-md-3 col-12 g-0" style="margin-top:5px!important; padding-right:5px!important">
                                     <select class="form-select" name="price_type_id[]" id="price_type_id">
                                         @foreach ($price_types as $ptype)
-                                        <option value="{{ $ptype->id }}">{{ $ptype->name }}</option>
+                                        <option value="{{ $ptype->id }}" @if($row->pt_id == $ptype->id) selected @endif>{{ $ptype->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
 
                                 <div class="col-md-3 col-12 g-0" style="margin-top:5px!important; padding-right:5px!important">
                                     <input type="number" min="0" class="form-control" name="price[]" id="price" placeholder="Price"
-                                            value="{{ $product->prices }}">
+                                            value="{{ $row->price }}">
                                 </div>
 
                                 <div class="col-md-4 col-12 g-0" style="margin-top:5px!important; padding-right:5px!important">
-                                    <input type="date" class="form-control" name="active_date[]" value="{{ $product->active_dates }}"
+                                    <input type="date" class="form-control" name="active_date[]" value="{{ $row->active_date }}"
                                         id="active_date">
                                 </div>
 
                                 <div class="col-md-2 col-12 d-flex align-items-end g-0" style="margin-top:5px!important;">
-                                    <a href="javascript:void(0)" class="btn btn-danger deleteRecord" data-id="{{ $product->price_ids }}"><span class="glyphicon glyphicon glyphicon-remove"
+                                    <a href="javascript:void(0)" class="btn btn-danger deleteRecord" data-id="{{ $row->id }}"><span class="glyphicon glyphicon glyphicon-remove"
                                             aria-hidden="true"></span> Remove</a>
                                 </div>
 
                             </div>
 
-                        {{-- @empty --}}
+                        @empty
 
                             <div class="row prices g-0"  style="margin-top:5px!important;">
 
@@ -155,7 +155,7 @@
 
                             </div>
 
-                        {{-- @endforelse --}}
+                        @endforelse
 
                         {{-- @forelse ($product->productPrices as $row)
 
