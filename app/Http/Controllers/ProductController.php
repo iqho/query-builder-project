@@ -23,7 +23,7 @@ class ProductController extends Controller
                                          //->where('p_price.product_id', '=', '5');
                                 })
                                 ->select('p.*', 'cat.name as cat_name', 'p_price.price as prices', 'p_price.active_date as active_dates')
-                                //->groupBy('p_price.product_id')
+                                //->groupBy('p.id')
 
                                 ->distinct()
                                 ->get();
@@ -42,45 +42,48 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
         {
             try {
-                $image = $request->file('image');
+                DB::transaction(function () {
 
-                if ($image) {
-                    $imageName = date("dmYhis") . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('product-images'), $imageName);
-                } else {
-                    $imageName = NULL;
-                }
+                    $image = $request->file('image');
 
-                $values = [
-                    'title' => $request->title,
-                    'description' => $request->description,
-                    'category_id' => $request->category_id,
-                    'image' => $imageName,
-                    'is_active' => $request->is_active ? $request->is_active : 0,
-                ];
+                    if ($image) {
+                        $imageName = date("dmYhis") . '.' . $image->getClientOriginalExtension();
+                        $image->move(public_path('product-images'), $imageName);
+                    } else {
+                        $imageName = NULL;
+                    }
 
-                DB::table('products')->insert($values);
-                $lastId = DB::getPdo()->lastInsertId();
-
-                // Product Price Type Store
-                $getAllPrices = $request->price;
-                $price_type_id = $request->price_type_id;
-                $active_date = $request->active_date;
-
-                $values = [];
-
-                foreach ($getAllPrices as $index => $price) {
-                    $values[] = [
-                        'product_id' => $lastId,
-                        'price' => $price,
-                        'price_type_id' => $price_type_id[$index],
-                        'active_date' => $active_date[$index],
+                    $values = [
+                        'title' => $request->title,
+                        'description' => $request->description,
+                        'category_id' => $request->category_id,
+                        'image' => $imageName,
+                        'is_active' => $request->is_active ? $request->is_active : 0,
                     ];
-                }
 
-                if (($price !== NULL) && ($price_type_id[$index] !== NULL)) {
-                    DB::table('product_prices')->insert($values);
-                }
+                    DB::table('products')->insert($values);
+                    $lastId = DB::getPdo()->lastInsertId();
+
+                    // Product Price Type Store
+                    $getAllPrices = $request->price;
+                    $price_type_id = $request->price_type_id;
+                    $active_date = $request->active_date;
+
+                    $values = [];
+
+                    foreach ($getAllPrices as $index => $price) {
+                        $values[] = [
+                            'product_id' => $lastId,
+                            'price' => $price,
+                            'price_type_id' => $price_type_id[$index],
+                            'active_date' => $active_date[$index],
+                        ];
+                    }
+
+                    if (($price !== NULL) && ($price_type_id[$index] !== NULL)) {
+                        DB::table('product_prices')->insert($values);
+                    }
+                });
 
             } catch (QueryException $e) {
                 $errorCode = $e->errorInfo[1];
