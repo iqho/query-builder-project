@@ -10,19 +10,19 @@
         </div>
 
         <div class="card-body">
-            <div class="row">
-                <div class="col-12">
+
                     @if ($message = Session::get('success'))
-                        <div class="alert alert-success alert-dismissible fade show p-2 w-50 text-center" role="alert" id="success">
-                            <strong>{{ $message }}</strong>
-                            <button type="button" class="btn-close p-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <div class="row d-flex justify-content-center">
+                            <div class="col-12 alert alert-success alert-dismissible fade show p-2 w-50 text-center" role="alert" id="success">
+                                <strong>{{ $message }}</strong>
+                                <button type="button" class="btn-close p-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
                         </div>
                     @endif
-
-                    <div id="successMessage" class="alert alert-success alert-dismissible fade show p-2 text-center" role="alert" style="display: none; max-width:400px">
+                    <div class="row d-flex justify-content-center">
+                        <div id="successMessage" class="col-12 alert alert-success alert-dismissible fade show p-2 text-center" role="alert" style="display: none; max-width:400px">
+                        </div>
                     </div>
-                </div>
-            </div>
 
             <div class="row">
                 <div class="col-12">
@@ -65,13 +65,6 @@
                                         <td class="align-middle">
                                             <strong>{{ $product->prices }}</strong><br>
                                             <small> Active From: {{ date('d F Y', strtotime($product->active_dates)) }} </small>
-                                           {{-- @foreach ($product->prices as $row) --}}
-
-                                                     {{-- <strong> @if ($row->priceType) {{ $row->priceType->name }} @else No Price Type @endif:
-                                                        @if ($row->price) {{ $row->price }} @else No Price @endif</strong><br>
-                                                        @if ($row->active_date) <small> Active From: {{ date('d F Y', strtotime($row->active_date)) }} </small> @endif
-                                                    <hr class="g-0"> --}}
-                                           {{-- @endforeach --}}
                                         </td>
 
                                         <td class="align-middle text-center">

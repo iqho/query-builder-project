@@ -8,19 +8,17 @@
         <div class="card-header"><h3>Add New Product</h3></div>
         <div class="card-body">
 
-            <div class="row">
-                <div class="col-12">
-                    @if ($errors->any())
-                        <div id="successMessage" class="alert alert-danger p-1 m-0">
-                            <ul class="g-0">
-                                @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+            @if ($errors->any())
+                <div class="row mb-2">
+                    <div id="successMessage" class="col-12 alert alert-danger p-1 m-0">
+                        <ul class="g-0">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </div>
-            </div>
+            @endif
 
             <div class="row">
                 <div class="col-12">
@@ -55,7 +53,7 @@
                         <div class="row mb-3">
                             <div class="col-8">
                                 <label for="category_id" class="form-label">Product Category</label>
-                                <select class="form-select" name="category_id" id="category_id">
+                                <select class="form-select" name="category_id" id="category_id" required>
                                     <option value="" selected>Please Select Product Category</option>
 
                                     @foreach ($categories as $category)
@@ -75,7 +73,7 @@
 
                             <div class="col-md-3 col-12 g-0" style="padding-right:5px!important">
                                 <label for="price_type_id" class="form-label">Product Price Type</label>
-                                <select class="form-select" name="price_type_id[]" id="price_type_id">
+                                <select class="form-select" name="price_type_id[]" id="price_type_id" required>
                                     <option value="" selected>Select Price Type</option>
                                     @foreach ($price_types as $ptype)
                                     <option value="{{ $ptype->id }}">{{ $ptype->name }}</option>
@@ -86,7 +84,7 @@
                             <div class="col-12 col-md-3 g-0" style="padding-right:5px!important">
                                 <label for="price" class="form-label">Price</label>
                                 <input type="number" min="0" class="form-control" name="price[]" id="price" placeholder="Price"
-                                        value="{{ old('price[]') }}">
+                                        value="{{ old('price[]') }}" required>
                             </div>
 
                             <div class="col-12 col-md-4 g-0" style="padding-right:5px!important">
@@ -159,8 +157,8 @@
                 reader.readAsDataURL(this.files[0]);
             });
 
-            // Hide Message After 5 Sec
-            $("#successMessage").delay(5000).slideUp(300);
+            // Hide Message After 10 Sec
+            $("#successMessage").delay(10000).slideUp(300);
 
             //add more fields group
             $(".addMore").click(function(){

@@ -11,8 +11,6 @@ use DB;
 
 class ProductController extends Controller
 {
-    // try-catch                ; for any single crud or other type of action
-    // DB::transaction()        ; when we use save/update in more than one table
 
     public function index()
         {
@@ -33,8 +31,15 @@ class ProductController extends Controller
 
     public function create()
         {
-            $categories = DB::table('categories')->where('is_active', 1)->Orderby('id', 'DESC')->get(['id', 'name']);
-            $price_types = DB::table('price_types')->where('is_active', 1)->Orderby('id', 'ASC')->get(['id', 'name']);
+            $categories = DB::table('categories')
+                                ->where('is_active', 1)
+                                ->Orderby('id', 'DESC')
+                                ->get(['id', 'name']);
+                                
+            $price_types = DB::table('price_types')
+                                ->where('is_active', 1)
+                                ->Orderby('id', 'ASC')
+                                ->get(['id', 'name']);
 
             return view('products.create', compact('categories', 'price_types'));
         }
@@ -42,15 +47,14 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
         {
             try {
-                DB::transaction(function () {
+                DB::transaction(function () use($request) {
 
-                    $image = $request->file('image');
+                    $imageName = NULL;
 
-                    if ($image) {
+                    if ($request->hasFile('image')) {
+                        $image = $request->file('image');
                         $imageName = date("dmYhis") . '.' . $image->getClientOriginalExtension();
                         $image->move(public_path('product-images'), $imageName);
-                    } else {
-                        $imageName = NULL;
                     }
 
                     $values = [
@@ -86,13 +90,15 @@ class ProductController extends Controller
                 });
 
             } catch (QueryException $e) {
-                $errorCode = $e->errorInfo[1];
 
-                if ($errorCode == 1062) {
-                    return redirect()->back()->withErrors(['msg' => 'This product name already exits under selected category']);
-                } else {
-                    return redirect()->back()->withErrors(['msg' => 'Unable to process request.Error:' . json_encode($e->getMessage(), true)]);
-                }
+                return back()->withErrors(['errors' => $e->getMessage()]);
+
+                // $errorCode = $e->errorInfo[1];
+                // if ($errorCode == 1062) {
+                //     return redirect()->back()->withErrors(['msg' => 'This product name already exits under selected category']);
+                // } else {
+                //     return redirect()->back()->withErrors(['msg' => 'Unable to process request.Error:' . json_encode($e->getMessage(), true)]);
+                // }
             }
 
             return redirect()->route('products.index')->with('success', 'Product Created Successfully.');
@@ -100,16 +106,26 @@ class ProductController extends Controller
 
     public function edit($id)
         {
-            $prices = DB::table('product_prices as pp')->join('price_types as pt', 'pt.id', 'pp.price_type_id' )->select('pp.*', 'pt.id as pt_id')->where('product_id', $id)->get();
+            $prices = DB::table('product_prices as pp')
+                                    ->join('price_types as pt', 'pt.id', 'pp.price_type_id' )
+                                    ->select('pp.*', 'pt.id as pt_id')
+                                    ->where('product_id', $id)
+                                    ->get();
 
             $product = DB::table('products as p')
                                     ->join('categories as cat', 'p.category_id', '=', 'cat.id')
                                     ->select('p.*', 'cat.name as cat_name', 'cat.name as cat_id')
                                     ->where('p.id', '=', $id)->first();
 
+            $categories = DB::table('categories')
+                                    ->where('is_active', 1)
+                                    ->Orderby('id', 'DESC')
+                                    ->get(['id', 'name']);
 
-            $categories = DB::table('categories')->where('is_active', 1)->Orderby('id', 'DESC')->get(['id', 'name']);
-            $price_types = DB::table('price_types')->where('is_active', 1)->Orderby('id', 'ASC')->get(['id', 'name']);
+            $price_types = DB::table('price_types')
+                                    ->where('is_active', 1)
+                                    ->Orderby('id', 'ASC')
+                                    ->get(['id', 'name']);
 
             return view('products.edit', compact('product', 'categories', 'price_types', 'prices'));
         }
@@ -117,77 +133,74 @@ class ProductController extends Controller
     public function update(StoreProductRequest $request, $id)
         {
             try {
-                $query = DB::table('products')->where('id', '=', $id);
-                $dbImage = $query->first();
+                DB::transaction(function () use($request, $id) {
+                    $query = DB::table('products')->where('id', '=', $id);
+                    $dbImage = $query->first();
 
-                $newImage = $request->file('image');
+                    $newImage = $request->file('image');
 
-                if ($newImage) {
-                    $imageName = date("dmYhis") . '.' . $newImage->getClientOriginalExtension();
-                    $newImage->move(public_path('product-images'), $imageName);
+                    if ($newImage) {
+                        $imageName = date("dmYhis") . '.' . $newImage->getClientOriginalExtension();
+                        $newImage->move(public_path('product-images'), $imageName);
 
-                    if ($dbImage->image !== null) {
-                        File::delete([public_path('product-images/' . $dbImage->image)]);
+                        if ($dbImage->image !== null) {
+                            File::delete([public_path('product-images/' . $dbImage->image)]);
+                        }
+                    } else {
+                        $imageName = $dbImage->image;
                     }
-                } else {
-                    $imageName = $dbImage->image;
-                }
 
-                $values = [
-                    'title' => $request->title,
-                    'description' => $request->description,
-                    'category_id' => $request->category_id,
-                    'image' => $imageName,
-                    'is_active' => $request->is_active ? $request->is_active : 0,
-                ];
+                    $values = [
+                        'title' => $request->title,
+                        'description' => $request->description,
+                        'category_id' => $request->category_id,
+                        'image' => $imageName,
+                        'is_active' => $request->is_active ? $request->is_active : 0,
+                    ];
 
-                $query->update($values);
+                    $query->update($values);
 
-                // Product Price Type Update
-                $product_price_id = $request->product_price_id;
+                    // Product Price Type Update
+                    $product_price_id = $request->product_price_id;
 
-                if ($product_price_id) {
-                    for ($i = 0; $i < count($product_price_id); $i++) {
+                    if ($product_price_id) {
+                        for ($i = 0; $i < count($product_price_id); $i++) {
 
-                        $values = [
-                            'product_id' => $id,
-                            'price' => $request->price[$i],
-                            'price_type_id' => $request->price_type_id[$i],
-                            'active_date' => $request->active_date[$i],
-                        ];
+                            $values = [
+                                'product_id' => $id,
+                                'price' => $request->price[$i],
+                                'price_type_id' => $request->price_type_id[$i],
+                                'active_date' => $request->active_date[$i],
+                            ];
 
-                        $check_id = DB::table('product_prices')->find($product_price_id[$i]);
+                            $check_id = DB::table('product_prices')->find($product_price_id[$i]);
 
-                        if ($check_id) {
-                            DB::table('product_prices')->where('id', $check_id->id)->update($values);
+                            if ($check_id) {
+                                DB::table('product_prices')->where('id', $check_id->id)->update($values);
+                            }
                         }
                     }
-                }
 
-                $price_type_new_id = $request->price_type_new_id;
+                    $price_type_new_id = $request->price_type_new_id;
 
-                if ($price_type_new_id) {
-                    for ($i = 0; $i < count($price_type_new_id); $i++) {
-                        $values2 = [
-                            'product_id' => $id,
-                            'price' => $request->new_price[$i],
-                            'price_type_id' => $request->price_type_new_id[$i],
-                            'active_date' => $request->new_active_date[$i],
-                        ];
+                    if ($price_type_new_id) {
+                        for ($i = 0; $i < count($price_type_new_id); $i++) {
+                            $values2 = [
+                                'product_id' => $id,
+                                'price' => $request->new_price[$i],
+                                'price_type_id' => $request->price_type_new_id[$i],
+                                'active_date' => $request->new_active_date[$i],
+                            ];
 
-                        if (($request->new_price[$i] !== NULL) && ($request->price_type_new_id[$i] !== NULL)) {
-                            DB::table('product_prices')->insert($values2);
+                            if (($request->new_price[$i] !== NULL) && ($request->price_type_new_id[$i] !== NULL)) {
+                                DB::table('product_prices')->insert($values2);
+                            }
                         }
                     }
-                }
+                });
 
             } catch (QueryException $e) {
-                $errorCode = $e->errorInfo[1];
-                if ($errorCode == 1062) {
-                    return redirect()->back()->withErrors(['msg' => 'This product name already exits under selected category']);
-                } else {
-                    return redirect()->back()->withErrors(['msg' => 'Unable to process request.Error:' . json_encode($e->getMessage(), true)]);
-                }
+                return back()->withErrors(['errors' => $e->getMessage()]);
             }
 
             return redirect()->route('products.index')->with('success', 'Product Updated Successfully.');
